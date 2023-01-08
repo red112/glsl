@@ -94,20 +94,31 @@ void display()
 
 	//Draw
 	glBegin(GL_TRIANGLES);
-	glColor3f(1.f, 0.f, 0.f);
-	glVertex3f(-0.5, -0.5, 0.0);
-	glColor3f(0.f, 1.f, 0.f);
-	glVertex3f(0.5, 0.0, 0.0);
-	glColor3f(0.f, 0.f, 1.f);
-	glVertex3f(0.0, 0.5, 0.0);
+		glColor3f(1.f, 0.f, 0.f);
+		glVertex3f(-0.5, -0.5, 0.0);
+		glColor3f(0.f, 1.f, 0.f);
+		glVertex3f(0.5, -0.5, 0.0);
+		glColor3f(0.f, 0.f, 1.f);
+		glVertex3f(0.0, 0.5, 0.0);
 	glEnd();
+
+	glPushMatrix();
+		glRotatef(90.f, 0.f, 0.f, 1.f);
+
+		glColor3f(1.f, 1.f, 0.f);
+		glBegin(GL_TRIANGLES);
+		glVertex3f(-0.5, -0.5 + 0.1, 0.1);
+		glVertex3f(0.5, -0.5 + 0.1, 0.1);
+		glVertex3f(0.0, 0.5 + 0.1, 0.1);
+		glEnd();
+
+	glPopMatrix();
+
 	glFlush();
 
-
-
 	glutSwapBuffers();
-	rotate_angle = rotate_angle + 0.1f;
-	if (rotate_angle > 360.f) rotate_angle -= 360.f;
+	//rotate_angle = rotate_angle + 0.1f;
+	//if (rotate_angle > 360.f) rotate_angle -= 360.f;
 }
 
 
