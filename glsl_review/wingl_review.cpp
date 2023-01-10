@@ -23,6 +23,10 @@ GLuint f_shader;			//fragment shader handle
 GLuint program_shader;		//shader program handle
 void setShaders();			//Shader 설정
 
+// 회전 Animation
+GLint loc = 0;
+
+
 //Logging
 #define printOpenGLError() printOglError(__FILE__, __LINE__)
 int printOglError(char* file, int line);
@@ -93,32 +97,17 @@ void display()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//Draw
-	glBegin(GL_TRIANGLES);
-		glColor3f(1.f, 0.f, 0.f);
-		glVertex3f(-0.5, -0.5, 0.0);
-		glColor3f(0.f, 1.f, 0.f);
-		glVertex3f(0.5, -0.5, 0.0);
-		glColor3f(0.f, 0.f, 1.f);
-		glVertex3f(0.0, 0.5, 0.0);
-	glEnd();
-
-	glPushMatrix();
-		glRotatef(90.f, 0.f, 0.f, 1.f);
-
-		glColor3f(1.f, 1.f, 0.f);
-		glBegin(GL_TRIANGLES);
-		glVertex3f(-0.5, -0.5 + 0.1, 0.1);
-		glVertex3f(0.5, -0.5 + 0.1, 0.1);
-		glVertex3f(0.0, 0.5 + 0.1, 0.1);
-		glEnd();
-
-	glPopMatrix();
-
+	glColor3f(0.2f, 0.2f, 0.6f);
+	glUniform1fARB(loc, rotate_angle);
+	//glPushMatrix();
+	//glRotatef(rotate_angle, 0.f, 1.f, 0.f);
+	glutWireTeapot(0.5f);
+	//glPopMatrix();
 	glFlush();
 
 	glutSwapBuffers();
-	//rotate_angle = rotate_angle + 0.1f;
-	//if (rotate_angle > 360.f) rotate_angle -= 360.f;
+	rotate_angle = rotate_angle + 0.001f;
+	if (rotate_angle > 360.f) rotate_angle -= 360.f;
 }
 
 
@@ -185,6 +174,9 @@ void setShaders()
 	printProgramInfoLog(program_shader);
 
 	glUseProgram(program_shader);
+
+	//animation용 회전값 핸들 설정
+	loc = glGetUniformLocationARB(program_shader, "angle");
 }
 
 
