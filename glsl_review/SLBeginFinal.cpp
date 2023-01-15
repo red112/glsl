@@ -353,6 +353,7 @@ void DrawPlane()
 	glEnd();
 
 }
+
 void DrawSphere(float rad, int numLatitude, int numLongitude)
 {	//WONIL : CAD&Graphics_01_ex.02 Sphere
 
@@ -373,33 +374,6 @@ void DrawSphere(float rad, int numLatitude, int numLongitude)
 	{
 		p1[1] = p2[1] = rad * cos(angleStepLati * (float)countLati);			//기준 Y좌표.(위도)
 		p3[1] = p4[1] = rad * cos(angleStepLati * (float)(countLati+1));		//다음 Y좌표.(위도)
-
-		//Y좌표로 법선 방향을 정하는 부분
-		/*
-		//P1의 법선 N1
-		if(p1[1]<0)								{	n1[0]=0.f;		n1[1]=-1.f;		n1[2]=0.f;	}
-		else if(p1[1]>=0 && p1[1]<0.333)		{	n1[0]=1.f;		n1[1]=0.f;		n1[2]=0.f;	}
-		else if(p1[1]>=0.333 && p1[1]<0.666)	{	n1[0]=sqrt(2.);	n1[1]=sqrt(2.);	n1[2]=0.f;	}
-		else									{	n1[0]=0.f;		n1[1]=1.f;		n1[2]=0.f;	}
-
-		if(p2[1]<0)								{	n2[0]=0.f;		n2[1]=-1.f;		n2[2]=0.f;	}
-		else if(p2[1]>=0 && p2[1]<0.333)		{	n2[0]=1.f;		n2[1]=0.f;		n2[2]=0.f;	}
-		else if(p2[1]>=0.333 && p2[1]<0.666)	{	n2[0]=sqrt(2.);	n2[1]=sqrt(2.);	n2[2]=0.f;	}
-		else									{	n2[0]=0.f;		n2[1]=1.f;		n2[2]=0.f;	}
-
-		if(p3[1]<0)								{	n3[0]=0.f;		n3[1]=-1.f;		n3[2]=0.f;	}
-		else if(p3[1]>=0 && p3[1]<0.333)		{	n3[0]=1.f;		n3[1]=0.f;		n3[2]=0.f;	}
-		else if(p3[1]>=0.333 && p3[1]<0.666)	{	n3[0]=sqrt(2.);	n3[1]=sqrt(2.);	n3[2]=0.f;	}
-		else									{	n3[0]=0.f;		n3[1]=1.f;		n3[2]=0.f;	}
-
-		if(p4[1]<0)								{	n4[0]=0.f;		n4[1]=-1.f;		n4[2]=0.f;	}
-		else if(p4[1]>=0 && p4[1]<0.333)		{	n4[0]=1.f;		n4[1]=0.f;		n4[2]=0.f;	}
-		else if(p4[1]>=0.333 && p4[1]<0.666)	{	n4[0]=sqrt(2.);	n4[1]=sqrt(2.);	n4[2]=0.f;	}
-		else									{	n4[0]=0.f;		n4[1]=1.f;		n4[2]=0.f;	}
-		*/
-
-
-
 
 		prjLen		= rad * sin(angleStepLati * (float)countLati);		//기준점의 XZ평면에 투영된 길이
 		prjLenNext	= rad * sin(angleStepLati * (float)(countLati+1));	//다음점의 XZ평면에 투영된 길이

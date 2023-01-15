@@ -3,8 +3,10 @@
 #include <gl/glew.h>
 #include <GL/glut.h>
 #include "textfile.h"
+#include <math.h>
 
-//OpenGL
+#define PI 3.141592
+
 void initGL();					//opengl 초기화
 
 //GLUT
@@ -12,7 +14,7 @@ void changeSize(int w, int h);	//윈도우 크기 변경 시 호출되는 callba
 
 //Rendering
 void display();				//기본 랜더링 코드
-float rotate_angle = 0.f;	//주전자 회전 animatio용 각도 회전 각도 변수
+//float rotate_angle = 0.f;	//주전자 회전 animatio용 각도 회전 각도 변수
 
 //GLEW
 void initGLEW();			//GLEW 초기화
@@ -24,7 +26,7 @@ GLuint program_shader;		//shader program handle
 void setShaders();			//Shader 설정
 
 // 회전 Animation
-GLint loc = 0;
+//GLint loc = 0;
 
 
 //Logging
@@ -33,6 +35,10 @@ int printOglError(char* file, int line);
 void printShaderInfoLog(GLuint obj);
 void printProgramInfoLog(GLuint obj);
 
+float slDir[3] = { 0.f, 0.f, -1.f };		//Spot light 방향
+
+void DrawSphere(float rad, int numLatitude, int numLongitude);
+void LightInit();
 
 int main(int argc, char** argv)
 {
@@ -45,8 +51,8 @@ int main(int argc, char** argv)
 	glutReshapeFunc(changeSize);
 	glutIdleFunc(display);
 
-	initGLEW();
-	setShaders();
+	//initGLEW();
+	//setShaders();
 
 	initGL();
 
@@ -69,20 +75,7 @@ void changeSize(int w, int h) {
 
 void initGL()
 {
-	//Enable/Disable
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glEnable(GL_DEPTH_TEST);
-
-	//Rendering
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glFrontFace(GL_CCW);
-	glColor3f(0.0f, 0.5f, 1.0f);
-
-	//Light
-	GLfloat lightPos[] = { 0.f, 0.f, 10.f, 0.f };
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
-	glEnable(GL_COLOR_MATERIAL);
+	LightInit();
 
 	//Modelview and projection
 	glMatrixMode(GL_PROJECTION);
@@ -97,17 +90,18 @@ void display()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//Draw
-	glColor3f(0.2f, 0.2f, 0.6f);
-	glUniform1fARB(loc, rotate_angle);
+	glColor3f(0.5f, 0.5f, 1.f);
+	//glUniform1fARB(loc, rotate_angle);
 	//glPushMatrix();
 	//glRotatef(rotate_angle, 0.f, 1.f, 0.f);
-	glutWireTeapot(0.5f);
+	//glutWireTeapot(0.5f);
+	DrawSphere(0.8f, 50, 50);
 	//glPopMatrix();
 	glFlush();
 
 	glutSwapBuffers();
-	rotate_angle = rotate_angle + 0.001f;
-	if (rotate_angle > 360.f) rotate_angle -= 360.f;
+	//rotate_angle = rotate_angle + 0.001f;
+	//if (rotate_angle > 360.f) rotate_angle -= 360.f;
 }
 
 
@@ -176,7 +170,7 @@ void setShaders()
 	glUseProgram(program_shader);
 
 	//animation용 회전값 핸들 설정
-	loc = glGetUniformLocationARB(program_shader, "angle");
+	//loc = glGetUniformLocationARB(program_shader, "angle");
 }
 
 
@@ -228,4 +222,130 @@ void printProgramInfoLog(GLuint obj)
 		printf("%s\n", infoLog);
 		free(infoLog);
 	}
+}
+
+
+
+void DrawSphere(float rad, int numLatitude, int numLongitude)
+{	//WONIL : CAD&Graphics_01_ex.02 Sphere
+
+	//최소한 육면체 이상은 되어야 하므로 위도는 2개, 경도는 3개를 최소로 한다.
+	if (numLatitude < 2)	numLatitude = 2;
+	if (numLongitude < 3)	numLongitude = 3;
+
+	//삼각함수를 쓰기 위해 Degree가 아닌 Radian을 쓰도록 한다.
+	float angleStepLati = PI / (float)numLatitude;		//위도는 180도, 즉 PI를 나눈다.
+	float angleStepLong = 2.f * PI / (float)numLongitude;	//경도는 360도, 즉 2*PI를 나눈다.
+
+
+	float prjLen, prjLenNext;
+	float p1[3], p2[3], p3[3], p4[3];
+	float n1[3], n2[3], n3[3], n4[3];
+	//위도
+	for (int countLati = 0;countLati < numLatitude;countLati++)
+	{
+		p1[1] = p2[1] = rad * cos(angleStepLati * (float)countLati);			//기준 Y좌표.(위도)
+		p3[1] = p4[1] = rad * cos(angleStepLati * (float)(countLati + 1));		//다음 Y좌표.(위도)
+
+		prjLen = rad * sin(angleStepLati * (float)countLati);		//기준점의 XZ평면에 투영된 길이
+		prjLenNext = rad * sin(angleStepLati * (float)(countLati + 1));	//다음점의 XZ평면에 투영된 길이
+
+		for (int countLong = 0;countLong < numLongitude;countLong++)
+		{
+			p1[0] = prjLen * cos(angleStepLong * (float)countLong);
+			p1[2] = prjLen * sin(angleStepLong * (float)countLong);
+
+			p2[0] = prjLen * cos(angleStepLong * (float)(countLong + 1));
+			p2[2] = prjLen * sin(angleStepLong * (float)(countLong + 1));
+
+			p3[0] = prjLenNext * cos(angleStepLong * (float)countLong);
+			p3[2] = prjLenNext * sin(angleStepLong * (float)countLong);
+
+			p4[0] = prjLenNext * cos(angleStepLong * (float)(countLong + 1));
+			p4[2] = prjLenNext * sin(angleStepLong * (float)(countLong + 1));
+
+			memcpy(n1, p1, sizeof(float) * 3);
+			memcpy(n2, p2, sizeof(float) * 3);
+			memcpy(n3, p3, sizeof(float) * 3);
+			memcpy(n4, p4, sizeof(float) * 3);
+
+			if (n1[1] > 0.6f) n1[1] = 1.f;
+			else if (n1[1] > 0.2f) n1[1] = 0.5f;
+			else if (n1[1] > -0.2f) n1[1] = 0.f;
+			else if (n1[1] > -0.6f) n1[1] = -0.5f;
+			else n1[1] = -1.f;
+
+			if (n2[1] > 0.6f) n2[1] = 1.f;
+			else if (n2[1] > 0.2f) n2[1] = 0.5f;
+			else if (n2[1] > -0.2f) n2[1] = 0.f;
+			else if (n2[1] > -0.6f) n2[1] = -0.5f;
+			else n2[1] = -1.f;
+
+			if (n3[1] > 0.6f) n3[1] = 1.f;
+			else if (n3[1] > 0.2f) n3[1] = 0.5f;
+			else if (n3[1] > -0.2f) n3[1] = 0.f;
+			else if (n3[1] > -0.6f) n3[1] = -0.5f;
+			else n3[1] = -1.f;
+
+			if (n4[1] > 0.6f) n4[1] = 1.f;
+			else if (n4[1] > 0.2f) n4[1] = 0.5f;
+			else if (n4[1] > -0.2f) n4[1] = 0.f;
+			else if (n4[1] > -0.6f) n4[1] = -0.5f;
+			else n4[1] = -1.f;
+
+
+			//			glBegin(GL_LINE_LOOP);
+			glBegin(GL_TRIANGLES);
+			glNormal3fv(n1);
+			glVertex3fv(p1);
+			glNormal3fv(n3);
+			glVertex3fv(p3);
+			glNormal3fv(n2);
+			glVertex3fv(p2);
+			glEnd();
+
+			//			glBegin(GL_LINE_LOOP);
+			glBegin(GL_TRIANGLES);
+			glNormal3fv(n2);
+			glVertex3fv(p2);
+			glNormal3fv(n3);
+			glVertex3fv(p3);
+			glNormal3fv(n4);
+			glVertex3fv(p4);
+			glEnd();
+
+		}
+
+
+	}
+
+}
+
+
+
+void LightInit()
+{
+	// Specify Black as the clear color
+	glClearColor(0.0f, .0f, .0f, 0.0f);
+	// Specify the back of the buffer as clear depth
+	glClearDepth(1.0f);
+	// Enable Depth Testing
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_COLOR_MATERIAL);
+	glFrontFace(GL_CCW);
+	glShadeModel(GL_FLAT);
+
+	float lpos[4] = { 0.f, 1.f, 0.f, 0.f };	
+	glLightfv(GL_LIGHT0, GL_POSITION, lpos);
+
+	float amb[4] = { 0.f, 0.f, 0.f, 1.f };
+	float dif[4] = { 0.5f, 0.5f, 0.5f, 1.f };
+	float spc[4] = { 1.f, 1.f, 1.f, 1.f };
+
+	glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, spc);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, dif);
+
+	glEnable(GL_LIGHT0);
 }
