@@ -26,7 +26,7 @@ GLuint program_shader;		//shader program handle
 void setShaders();			//Shader 설정
 
 // 회전 Animation
-//GLint loc = 0;
+GLint loc = 0;
 
 
 //Logging
@@ -36,6 +36,7 @@ void printShaderInfoLog(GLuint obj);
 void printProgramInfoLog(GLuint obj);
 
 float slDir[3] = { 0.f, 0.f, -1.f };		//Spot light 방향
+float light_pos[4] = { 1.f, 1.f, 1.f, 0.f };       //Directional light
 
 void DrawSphere(float rad, int numLatitude, int numLongitude);
 void LightInit();
@@ -51,8 +52,8 @@ int main(int argc, char** argv)
 	glutReshapeFunc(changeSize);
 	glutIdleFunc(display);
 
-	//initGLEW();
-	//setShaders();
+	initGLEW();
+	setShaders();
 
 	initGL();
 
@@ -95,7 +96,7 @@ void display()
 	//glPushMatrix();
 	//glRotatef(rotate_angle, 0.f, 1.f, 0.f);
 	//glutWireTeapot(0.5f);
-	DrawSphere(0.8f, 50, 50);
+	DrawSphere(0.8f, 10, 10);
 	//glPopMatrix();
 	glFlush();
 
@@ -171,6 +172,10 @@ void setShaders()
 
 	//animation용 회전값 핸들 설정
 	//loc = glGetUniformLocationARB(program_shader, "angle");
+
+
+	loc = glGetUniformLocationARB(program_shader, "lightDir");
+	glUniform3fARB(loc, light_pos[0], light_pos[1], light_pos[2]);
 }
 
 
@@ -227,7 +232,7 @@ void printProgramInfoLog(GLuint obj)
 
 
 void DrawSphere(float rad, int numLatitude, int numLongitude)
-{	//WONIL : CAD&Graphics_01_ex.02 Sphere
+{	
 
 	//최소한 육면체 이상은 되어야 하므로 위도는 2개, 경도는 3개를 최소로 한다.
 	if (numLatitude < 2)	numLatitude = 2;
@@ -269,31 +274,6 @@ void DrawSphere(float rad, int numLatitude, int numLongitude)
 			memcpy(n3, p3, sizeof(float) * 3);
 			memcpy(n4, p4, sizeof(float) * 3);
 
-			if (n1[1] > 0.6f) n1[1] = 1.f;
-			else if (n1[1] > 0.2f) n1[1] = 0.5f;
-			else if (n1[1] > -0.2f) n1[1] = 0.f;
-			else if (n1[1] > -0.6f) n1[1] = -0.5f;
-			else n1[1] = -1.f;
-
-			if (n2[1] > 0.6f) n2[1] = 1.f;
-			else if (n2[1] > 0.2f) n2[1] = 0.5f;
-			else if (n2[1] > -0.2f) n2[1] = 0.f;
-			else if (n2[1] > -0.6f) n2[1] = -0.5f;
-			else n2[1] = -1.f;
-
-			if (n3[1] > 0.6f) n3[1] = 1.f;
-			else if (n3[1] > 0.2f) n3[1] = 0.5f;
-			else if (n3[1] > -0.2f) n3[1] = 0.f;
-			else if (n3[1] > -0.6f) n3[1] = -0.5f;
-			else n3[1] = -1.f;
-
-			if (n4[1] > 0.6f) n4[1] = 1.f;
-			else if (n4[1] > 0.2f) n4[1] = 0.5f;
-			else if (n4[1] > -0.2f) n4[1] = 0.f;
-			else if (n4[1] > -0.6f) n4[1] = -0.5f;
-			else n4[1] = -1.f;
-
-
 			//			glBegin(GL_LINE_LOOP);
 			glBegin(GL_TRIANGLES);
 			glNormal3fv(n1);
@@ -331,11 +311,12 @@ void LightInit()
 	glClearDepth(1.0f);
 	// Enable Depth Testing
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_LIGHTING);
+	//glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
 	glFrontFace(GL_CCW);
-	glShadeModel(GL_FLAT);
+	glShadeModel(GL_SMOOTH);
 
+	/*
 	float lpos[4] = { 0.f, 1.f, 0.f, 0.f };	
 	glLightfv(GL_LIGHT0, GL_POSITION, lpos);
 
@@ -346,6 +327,6 @@ void LightInit()
 	glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, spc);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, dif);
-
 	glEnable(GL_LIGHT0);
+	*/
 }
