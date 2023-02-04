@@ -96,7 +96,7 @@ void display()
 	//glPushMatrix();
 	//glRotatef(rotate_angle, 0.f, 1.f, 0.f);
 	//glutWireTeapot(0.5f);
-	DrawSphere(0.8f, 10, 10);
+	DrawSphere(0.8f, 40, 40);
 	//glPopMatrix();
 	glFlush();
 

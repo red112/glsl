@@ -1,14 +1,16 @@
-// minimal fragment shader
-// www.lighthouse3d.com
+uniform vec3 lightDir;
+varying vec3 normal;
+
 void main()
 {
-	//vec4 invColor;
-	//invColor[0]=1.f-gl_Color[0];
-	//invColor[1]=1.f-gl_Color[1];
-	//invColor[2]=1.f-gl_Color[2];
-	//invColor[3]=1.f-gl_Color[3];
-	//gl_FragColor = invColor;
+         vec4 color;
+		 float intensity;
+		 intensity = max(dot(lightDir,normalize(normal)),0.0);
 
-	gl_FragColor = gl_Color;
-	
+         if (intensity > 0.95)        color = vec4(0.5,0.5,1.0,1.0);
+         else if (intensity > 0.5)    color = vec4(0.3,0.3,0.6,1.0);
+         else if (intensity > 0.25)   color = vec4(0.2,0.2,0.4,1.0);
+         else                        color = vec4(0.1,0.1,0.2,1.0);        
+         gl_FragColor = color;
 }
+
