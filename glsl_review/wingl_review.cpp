@@ -173,7 +173,6 @@ void setShaders()
 	//animation용 회전값 핸들 설정
 	//loc = glGetUniformLocationARB(program_shader, "angle");
 
-
 	loc = glGetUniformLocationARB(program_shader, "material_diffuse");
 	glUniform4fARB(loc, material_diffuse[0], material_diffuse[1], material_diffuse[2],material_diffuse[3]);
 }
