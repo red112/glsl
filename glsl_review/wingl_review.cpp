@@ -36,7 +36,7 @@ void printShaderInfoLog(GLuint obj);
 void printProgramInfoLog(GLuint obj);
 
 float slDir[3] = { 0.f, 0.f, -1.f };		//Spot light 방향
-float light_pos[4] = { 1.f, 1.f, 1.f, 0.f };       //Directional light
+float material_diffuse[4] = { 0.f, 0.f, 1.f, 1.f };      
 
 void DrawSphere(float rad, int numLatitude, int numLongitude);
 void LightInit();
@@ -174,8 +174,8 @@ void setShaders()
 	//loc = glGetUniformLocationARB(program_shader, "angle");
 
 
-	loc = glGetUniformLocationARB(program_shader, "lightDir");
-	glUniform3fARB(loc, light_pos[0], light_pos[1], light_pos[2]);
+	loc = glGetUniformLocationARB(program_shader, "material_diffuse");
+	glUniform4fARB(loc, material_diffuse[0], material_diffuse[1], material_diffuse[2],material_diffuse[3]);
 }
 
 
@@ -305,28 +305,14 @@ void DrawSphere(float rad, int numLatitude, int numLongitude)
 
 void LightInit()
 {
-	// Specify Black as the clear color
 	glClearColor(0.0f, .0f, .0f, 0.0f);
-	// Specify the back of the buffer as clear depth
 	glClearDepth(1.0f);
-	// Enable Depth Testing
 	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_LIGHTING);
-	glEnable(GL_COLOR_MATERIAL);
-	glFrontFace(GL_CCW);
-	glShadeModel(GL_SMOOTH);
+	//glEnable(GL_COLOR_MATERIAL);
+	//glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+	float lpos[4] = { 1.f, 1.f, 1.f, 0.f };	
+	float dif[4] = { 1.f, 0.f, 0.f, 1.f };
 
-	/*
-	float lpos[4] = { 0.f, 1.f, 0.f, 0.f };	
 	glLightfv(GL_LIGHT0, GL_POSITION, lpos);
-
-	float amb[4] = { 0.f, 0.f, 0.f, 1.f };
-	float dif[4] = { 0.5f, 0.5f, 0.5f, 1.f };
-	float spc[4] = { 1.f, 1.f, 1.f, 1.f };
-
-	glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, spc);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, dif);
-	glEnable(GL_LIGHT0);
-	*/
 }
