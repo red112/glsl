@@ -36,7 +36,6 @@ void printShaderInfoLog(GLuint obj);
 void printProgramInfoLog(GLuint obj);
 
 float slDir[3] = { 0.f, 0.f, -1.f };		//Spot light 방향
-float material_diffuse[4] = { 0.f, 0.f, 1.f, 1.f };      
 
 void DrawSphere(float rad, int numLatitude, int numLongitude);
 void LightInit();
@@ -91,12 +90,12 @@ void display()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//Draw
-	glColor3f(0.5f, 0.5f, 1.f);
+	//glColor3f(0.5f, 0.5f, 1.f);
 	//glUniform1fARB(loc, rotate_angle);
 	//glPushMatrix();
 	//glRotatef(rotate_angle, 0.f, 1.f, 0.f);
 	//glutWireTeapot(0.5f);
-	DrawSphere(0.8f, 40, 40);
+	DrawSphere(0.8f, 5, 5);
 	//glPopMatrix();
 	glFlush();
 
@@ -173,8 +172,8 @@ void setShaders()
 	//animation용 회전값 핸들 설정
 	//loc = glGetUniformLocationARB(program_shader, "angle");
 
-	loc = glGetUniformLocationARB(program_shader, "material_diffuse");
-	glUniform4fARB(loc, material_diffuse[0], material_diffuse[1], material_diffuse[2],material_diffuse[3]);
+	//loc = glGetUniformLocationARB(program_shader, "material_diffuse");
+	//glUniform4fARB(loc, material_diffuse[0], material_diffuse[1], material_diffuse[2],material_diffuse[3]);
 }
 
 
@@ -307,11 +306,20 @@ void LightInit()
 	glClearColor(0.0f, .0f, .0f, 0.0f);
 	glClearDepth(1.0f);
 	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_COLOR_MATERIAL);
-	//glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-	float lpos[4] = { 1.f, 1.f, 1.f, 0.f };	
-	float dif[4] = { 1.f, 0.f, 0.f, 1.f };
+
+	float lpos[4] = { 1.f, 1.f, 1.f, 0.f };
+	float dif[4] = { 0.8f, 0.8f, 0.8f, 1.f };
+	float amb[4] = { 0.5f, 0.f, 0.f, 1.f };
+	float spc[4] = { 1.f, 1.f, 1.f, 1.f };
 
 	glLightfv(GL_LIGHT0, GL_POSITION, lpos);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, dif);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, spc);
+
+	float material_amb_diffuse[4] = { 0.2f, 0.2f, 1.f, 1.f };
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, material_amb_diffuse);
+	glMaterialfv(GL_FRONT, GL_AMBIENT, material_amb_diffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, spc);
+	glMateriali(GL_FRONT, GL_SHININESS, 128);
 }
