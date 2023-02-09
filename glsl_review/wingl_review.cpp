@@ -36,7 +36,7 @@ void printShaderInfoLog(GLuint obj);
 void printProgramInfoLog(GLuint obj);
 
 float slDir[3] = { 0.f, 0.f, -1.f };		//Spot light 방향
-float lpos[4] = { 0.f, 0.f, 1000.f, 1.f };
+float lpos[4] = { 0.f, 0.f, 1.f, 1.f };
 bool bIncrease = true;
 
 void DrawSphere(float rad, int numLatitude, int numLongitude);
@@ -96,31 +96,33 @@ void display()
 	//glUniform1fARB(loc, rotate_angle);
 	//glPushMatrix();
 	//glRotatef(rotate_angle, 0.f, 1.f, 0.f);
-	//glutWireTeapot(0.5f);
-	DrawSphere(0.8f, 40, 40);
+	glutSolidTeapot(0.5f);
+	//DrawSphere(0.8f, 40, 40);
 	//glPopMatrix();
 	glFlush();
 
 	glutSwapBuffers();
 	//rotate_angle = rotate_angle + 0.001f;
 	//if (rotate_angle > 360.f) rotate_angle -= 360.f;
+	float route_len = 1.f;
 	if (bIncrease)
 	{
-		lpos[0] = lpos[0] + 0.2f;
-		if (lpos[0] >= 2000.f)
+		lpos[0] = lpos[0] + 0.0002f;
+		if (lpos[0] >= route_len)
 		{
-			lpos[0] = 2000.f;	bIncrease = false;
+			lpos[0] = route_len;	bIncrease = false;
 		}
 	}
 	else
 	{
-		lpos[0] = lpos[0] - 0.2f;
-		if (lpos[0] <= -2000.f)
+		lpos[0] = lpos[0] - 0.0002f;
+		if (lpos[0] <= -route_len)
 		{
-			lpos[0] = -2000.f;	bIncrease = true;
+			lpos[0] = -route_len;	bIncrease = true;
 		}
 	}
 	glLightfv(GL_LIGHT0, GL_POSITION, lpos);
+	
 
 }
 
@@ -329,7 +331,7 @@ void LightInit()
 
 
 	float dif[4] = { 0.8f, 0.8f, 0.8f, 1.f };
-	float amb[4] = { 0.5f, 0.f, 0.f, 1.f };
+	float amb[4] = { 0.0f, 0.f, 0.f, 1.f };
 	float spc[4] = { 1.f, 1.f, 1.f, 1.f };
 
 	glLightfv(GL_LIGHT0, GL_POSITION, lpos);
@@ -337,7 +339,7 @@ void LightInit()
 	glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, spc);
 
-	float material_amb_diffuse[4] = { 0.2f, 0.2f, 1.f, 1.f };
+	float material_amb_diffuse[4] = { 0.2f, 0.2f, 0.8f, 1.f };
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, material_amb_diffuse);
 	glMaterialfv(GL_FRONT, GL_AMBIENT, material_amb_diffuse);
 	glMaterialfv(GL_FRONT, GL_SPECULAR, spc);
@@ -348,4 +350,11 @@ void LightInit()
 	glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.8);
 	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.001);
 	//glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.9);
+
+	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 25.f);
+	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, slDir);
+	glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 2.f);
+	
+	//glEnable(GL_LIGHT0);
+
 }
