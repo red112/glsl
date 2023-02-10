@@ -144,9 +144,6 @@ bool LoadTGA(TextureImage *texture, char *filename)				// Loads A TGA File Into 
 //GLuint  textures[2];
 void	DrawCube()
 {
-
-	/*
-	
 	glBegin(GL_TRIANGLES);
 	//+Z
 		glNormal3f(0.f,0.f,1.f);
@@ -204,11 +201,9 @@ void	DrawCube()
 		glTexCoord2fv(t3);			glVertex3fv(c0);
 
 	glEnd();
-	*/
-	
 
 
-	
+	/*
 	glBegin(GL_TRIANGLES);
 	//+Z
 		glNormal3f(0.f,0.f,1.f);
@@ -266,7 +261,7 @@ void	DrawCube()
 		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t3);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t3);		glVertex3fv(c0);
 
 	glEnd();
-	
+	*/
 
 }
 
@@ -289,6 +284,7 @@ bool isInString(char *string, const char *search)
 	}	
 	return false;													// Sorry, Not Found!
 }
+
 void InitTexture()
 {
 	glEnable(GL_TEXTURE_2D);
