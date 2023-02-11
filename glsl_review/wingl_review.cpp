@@ -36,7 +36,7 @@ void printShaderInfoLog(GLuint obj);
 void printProgramInfoLog(GLuint obj);
 
 float slDir[3] = { 0.f, 0.f, -1.f };		//Spot light 방향
-float lpos[4] = { 0.f, 0.f, 1.f, 1.f };
+float lpos[4] = { 0.f, 1.f, 0.f, 0.f };
 bool bIncrease = true;
 
 
@@ -56,6 +56,11 @@ float t1[2] = { 1.f,0.f };
 float t2[2] = { 1.f,1.f };
 float t3[2] = { 0.f,1.f };
 
+
+float t20[2] = { 0.f,0.f };
+float t21[2] = { 2.0f,0.f };
+float t22[2] = { 2.0f,2.0f };
+float t23[2] = { 0.f,2.0f };
 
 /////////////////////////// TEXTURE TGA 
 typedef struct									// Create A Structure
@@ -153,10 +158,10 @@ void InitTexture()
 {
 	bool result;
 	result = LoadTGA(&textures[0], (char*)("box_tga.tga"));
-
-	GLubyte str[1024];
+	result = LoadTGA(&textures[1], (char*)("l3d_tga.tga"));
 
 	/*
+	GLubyte str[1024];
 	char* extensions;
 	extensions = strdup((char*)glGetString(GL_EXTENSIONS));			// Fetch Extension String
 	int len = strlen(extensions);
@@ -165,13 +170,23 @@ void InitTexture()
 	printf("%s", extensions);
 	*/
 
-	glEnable(GL_TEXTURE_2D);
-
 	// TEXTURE-UNIT #0		
 	glActiveTextureARB(GL_TEXTURE0_ARB);
+	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, textures[0].texID);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_EXT);
 	glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB_EXT, GL_REPLACE);
+	// TEXTURE-UNIT #1:
+	glActiveTextureARB(GL_TEXTURE1_ARB);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[1].texID);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_EXT);
+	glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB_EXT, GL_ADD);
+
+	glActiveTexture(GL_TEXTURE0_ARB);
+	glBindTexture(GL_TEXTURE_2D, textures[0].texID);
+	glActiveTexture(GL_TEXTURE1_ARB);
+	glBindTexture(GL_TEXTURE_2D, textures[1].texID);
 }
 
 
@@ -182,6 +197,7 @@ void InitTexture()
 
 void DrawSphere(float rad, int numLatitude, int numLongitude);
 void DrawCube();
+void	DrawMultiTexCube();
 void LightInit();
 
 int main(int argc, char** argv)
@@ -240,7 +256,8 @@ void display()
 	glPushMatrix();
 	glRotatef(rotate_angle, 1.2f, 1.5f, 1.8f);
 	//glutSolidTeapot(0.5f);
-	DrawCube();
+	//DrawCube();
+	DrawMultiTexCube();
 	// 
 	//DrawSphere(0.8f, 40, 40);
 	glPopMatrix();
@@ -336,11 +353,18 @@ void setShaders()
 
 	glUseProgram(program_shader);
 
+
 	//animation용 회전값 핸들 설정
 	//loc = glGetUniformLocationARB(program_shader, "angle");
 
 	//loc = glGetUniformLocationARB(program_shader, "material_diffuse");
 	//glUniform4fARB(loc, material_diffuse[0], material_diffuse[1], material_diffuse[2],material_diffuse[3]);
+
+	loc = glGetUniformLocation(program_shader, "tex");
+	glUniform1i(loc, 0);
+	loc = glGetUniformLocation(program_shader, "l3d");
+	glUniform1i(loc, 1);
+
 }
 
 
@@ -531,6 +555,73 @@ void	DrawCube()
 }
 
 
+
+
+//GLuint  textures[2];
+void	DrawMultiTexCube()
+{
+	glBegin(GL_TRIANGLES);
+	//+Z
+		glNormal3f(0.f,0.f,1.f);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t0);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t20);		glVertex3fv(c0);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t1);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t21);		glVertex3fv(c1);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t2);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t22);		glVertex3fv(c2);
+
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t0);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t20);		glVertex3fv(c0);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t2);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t22);		glVertex3fv(c2);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t3);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t23);		glVertex3fv(c3);
+	//-Z
+		glNormal3f(0.f,0.f,-1.f);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t0);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t20);		glVertex3fv(c5);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t1);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t21);		glVertex3fv(c4);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t2);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t22);		glVertex3fv(c7);
+
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t0);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t20);		glVertex3fv(c5);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t2);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t22);		glVertex3fv(c7);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t3);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t23);		glVertex3fv(c6);
+	//+X
+		glNormal3f(1.f,0.f,0.f);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t0);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t20);		glVertex3fv(c1);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t1);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t21);		glVertex3fv(c5);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t2);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t22);		glVertex3fv(c6);
+
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t0);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t20);		glVertex3fv(c1);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t2);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t22);		glVertex3fv(c6);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t3);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t23);		glVertex3fv(c2);
+	//-X
+		glNormal3f(-1.f,0.f,0.f);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t3);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t23);		glVertex3fv(c7);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t0);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t20);		glVertex3fv(c4);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t1);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t21);		glVertex3fv(c0);
+
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t2);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t22);		glVertex3fv(c3);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t3);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t23);		glVertex3fv(c7);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t1);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t21);		glVertex3fv(c0);
+	//+Y
+		glNormal3f(0.f,1.f,0.f);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t0);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t20);		glVertex3fv(c2);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t1);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t21);		glVertex3fv(c6);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t2);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t22);		glVertex3fv(c7);
+
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t0);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t20);		glVertex3fv(c2);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t2);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t22);		glVertex3fv(c7);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t3);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t23);		glVertex3fv(c3);
+	//-Y
+		glNormal3f(0.f,-1.f,0.f);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t1);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t21);		glVertex3fv(c5);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t2);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t22);		glVertex3fv(c1);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t3);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t23);		glVertex3fv(c0);
+
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t0);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t20);		glVertex3fv(c4);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t1);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t21);		glVertex3fv(c5);
+		glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, t3);		glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, t23);		glVertex3fv(c0);
+
+	glEnd();
+
+
+}
+
+
 void LightInit()
 {
 	glClearColor(0.0f, .0f, .0f, 0.0f);
@@ -539,7 +630,7 @@ void LightInit()
 
 
 	float dif[4] = { 0.8f, 0.8f, 0.8f, 1.f };
-	float amb[4] = { 0.0f, 0.f, 0.f, 1.f };
+	float amb[4] = { 0.0f, 0.0f, 0.0f, 1.f };
 	float spc[4] = { 1.f, 1.f, 1.f, 1.f };
 
 	glLightfv(GL_LIGHT0, GL_POSITION, lpos);
@@ -547,7 +638,7 @@ void LightInit()
 	glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, spc);
 
-	float material_amb_diffuse[4] = { 0.2f, 0.2f, 0.8f, 1.f };
+	float material_amb_diffuse[4] = { 0.9f, 0.9f, 0.9f, 1.f };
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, material_amb_diffuse);
 	glMaterialfv(GL_FRONT, GL_AMBIENT, material_amb_diffuse);
 	glMaterialfv(GL_FRONT, GL_SPECULAR, spc);
@@ -555,14 +646,16 @@ void LightInit()
 
 
 	// Set attenuation
-	glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.8);
-	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.001);
+	//glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.8);
+	//glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.001);
 	//glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.9);
 
-	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 25.f);
-	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, slDir);
-	glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 2.f);
+	//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 25.f);
+	//glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, slDir);
+	//glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 2.f);
 	
-	//glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHTING);
+
 
 }
